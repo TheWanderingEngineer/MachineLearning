@@ -40,7 +40,7 @@ def train_test(model: nn.Module,
   model.to(device)
   print(f"Selected Device: {device}")
   train_losses, train_accs, test_losses, test_accs = [], [], [], []
-  print_interval_train = max(1, len(train_dl)//(prints_per_epoch-1))
+  print_interval_train = max(1, len(train_dl)//(prints_per_epoch))
   for epoch in range(epochs):
     print(f"\n---------------------------- Epoch {epoch+1}/{epochs} ----------------------------")
     print("\nTraining Phase:")
@@ -65,7 +65,7 @@ def train_test(model: nn.Module,
         print(f"Batch {batch}/{len(train_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc.item()}")
     train_losses.append(round(train_loss/len(train_dl),4))
     train_accs.append(round(train_acc/len(train_dl),3))
-    print(f"Average Train Accuracy in this epoch: {train_acc/len(train_dl):.4f}")
+    print(f"Average Train Accuracy in this epoch: {(train_acc/len(train_dl)):.4f}")
     if test_dl:
       print("\nTesting Phase:")
       print_interval_test = max(1, len(test_dl) // prints_per_epoch)
@@ -83,9 +83,9 @@ def train_test(model: nn.Module,
             print(f"Batch {batch}/{len(test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc.item()}")
         test_losses.append(round(test_loss/len(test_dl),4))
         test_accs.append(round(test_acc/len(test_dl),3))
-        print(f"Average Test Accuracy in this epoch: {test_acc/len(test_dl):.4f}")
+        print(f"Average Test Accuracy in this epoch: {(test_acc/len(test_dl)):.4f}")
         if target_test_acc and test_acc/len(test_dl) >= target_test_acc:
-          print(f"\nEarly Stopping: Average Test accuracy {test_acc/len(test_dl):.4f} reached/exceeded the target {target_test_acc:.4f}")
+          print(f"\nEarly Stopping: Average Test accuracy {(test_acc/len(test_dl)):.4f} reached/exceeded the target {target_test_acc:.4f}")
           return train_losses, train_accs, test_losses, test_accs
   return train_losses,train_accs,test_losses,test_accs #Values are per epoch (averaged)
       
