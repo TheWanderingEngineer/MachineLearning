@@ -40,7 +40,7 @@ def train_test(model: nn.Module,
   model.to(device)
   print(f"Selected Device: {device}")
   train_losses, train_accs, test_losses, test_accs = [], [], [], []
-  print_interval_train = max(1, len(train_dl)//prints_per_epoch)
+  print_interval_train = max(1, len(train_dl)//(prints_per_epoch-1))
   for epoch in range(epochs):
     print(f"\n---------------------------- Epoch {epoch+1}/{epochs} ----------------------------")
     print("\nTraining Phase:")
