@@ -57,7 +57,7 @@ def train_test(model: nn.Module,
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip_grad)
       optimizer.step()
       if scheduler:
-        scheduler.step()  # StepLR or similar schedulers
+        scheduler.step()
       acc = (y_logits.argmax(dim=1) == y).float().mean()
       train_acc+=acc.item()
 
@@ -65,6 +65,7 @@ def train_test(model: nn.Module,
         print(f"Batch {batch}/{len(train_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc.item()}")
     train_losses.append(train_loss/len(train_dl))
     train_accs.append(train_acc/len(train_dl))
+    print(f"Average Train Accuracy in this epoch: {train_acc/len(train_dl)}")
     if test_dl:
       print("\nTesting Phase:")
       print_interval_test = max(1, len(test_dl) // prints_per_epoch)
@@ -82,6 +83,7 @@ def train_test(model: nn.Module,
             print(f"Batch {batch}/{len(test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc.item()}")
         test_losses.append(test_loss/len(test_dl))
         test_accs.append(test_acc/len(test_dl))
+        print(f"Average Test Accuracy in this epoch: {test_acc/len(test_dl)}")
         if target_test_acc and test_acc/len(test_dl) >= target_test_acc:
           print(f"\nEarly Stopping: Average Test accuracy {test_acc/len(test_dl):.4f} reached/exceeded the target {target_test_acc:.4f}")
           return train_losses, train_accs, test_losses, test_accs
