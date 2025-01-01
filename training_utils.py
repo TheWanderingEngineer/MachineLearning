@@ -71,6 +71,7 @@ class ModelManager():
                 self.model.eval()
                 with torch.inference_mode():
                     for batch, (X,y) in enumerate(self.test_dl):
+                        X, y = X.to(self.device), y.to(self.device)
                         test_logits = self.model(X)
                         loss = self.loss_fn(test_logits,y)
                         test_loss+=round(loss.item(),4)
