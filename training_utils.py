@@ -42,7 +42,7 @@ class ModelManager():
         #print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
         for epoch in range(epochs):
             self.model.train()
-            print(f"------------------------------[Epoch {epoch}]------------------------------")
+            print(f"------------------------------[Epoch {epoch+1}]------------------------------")
             print(f"Training Phase:")
             train_loss, train_acc = 0,0
             for batch, (X,y) in enumerate(self.train_dl):
@@ -64,7 +64,7 @@ class ModelManager():
             train_acc_epoch = train_acc/len(self.train_dl)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Epoch {epoch} stats:\nAverage Loss: {train_loss_epoch:.4f}\n Average Accuracy: {(train_acc_epoch)*100:.4f}")
+            print(f"Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch:.4f}\nAverage Accuracy: {(train_acc_epoch)*100:.4f}%")
     
         return self.batch_stats, self.epoch_stats
     
