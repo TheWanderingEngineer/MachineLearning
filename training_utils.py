@@ -37,6 +37,7 @@ class ModelManager():
                    clip_grad: Optional[float] = None,
                    scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None,
                    target_test_acc: Optional[float] = None):
+        self.model.to(self.device)
         print_interval_train = max(1, len(self.train_dl)//(prints_per_epoch))
         #print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
         for epoch in range(epochs):
