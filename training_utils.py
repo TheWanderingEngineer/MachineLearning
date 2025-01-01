@@ -43,16 +43,27 @@ class ModelManager():
             self.model.train()
             print(f"------------------------------[Epoch {epoch}]------------------------------")
             print(f"Training Phase:")
+            train_loss, train_acc = 0,0
             for batch, (X,y) in enumerate(self.train_dl):
                 X, y = X.to(self.device), y.to(self.device)
                 train_logits = self.model(X)
                 loss = self.loss_fn(train_logits,y)
+                train_loss+=round(loss.item(),4)
+                self.batch_stats['train_loss'].append(loss.item())
+                acc = round((train_logits.argmax(dim=1) == y).float().mean().item(),4)
+                train_acc+=acc
+                self.batch_stats['train_acc'].append(acc)
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                if batch % print_interval_train == 0:
-                    print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy {}")
 
+                if batch % print_interval_train == 0:
+                    print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy {acc}")
+            train_loss_epoch = train_loss/len(self.train_dl)
+            train_acc_epoch = train_acc/len(self.train_dl)
+            self.epoch_stats["train_loss"].append(train_loss_epoch)
+            self.epoch_stats["train_acc"].append(train_acc_epoch)
+            print(f"Epoch {epoch} stats:\nAverage Loss: {train_loss_epoch}\n Average Accuracy: {train_acc_epoch}")
     
         return self.batch_stats, self.epoch_stats
     
