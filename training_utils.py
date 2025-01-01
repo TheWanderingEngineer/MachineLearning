@@ -75,10 +75,10 @@ class ModelManager():
                         test_logits = self.model(X)
                         loss = self.loss_fn(test_logits,y)
                         test_loss+=round(loss.item(),4)
-                        self.batch_stats("test_loss").append(loss)
+                        self.batch_stats["test_loss"].append(loss)
                         acc = round((test_logits.argmax(dim=1) == y).float().mean().item(),4)
                         test_acc+= acc
-                        self.batch_stats("test_acc").append(acc)
+                        self.batch_stats["test_acc"].append(acc)
                         if batch % print_interval_test == 0:
                             print(f"Batch {batch}/{len(self.test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
                     test_loss_epoch = round(test_loss/len(self.test_dl),4)
