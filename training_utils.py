@@ -39,7 +39,7 @@ class ModelManager():
                    target_test_acc: Optional[float] = None):
         self.model.to(self.device)
         print_interval_train = max(1, len(self.train_dl)//(prints_per_epoch))
-        #print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
+        
         for epoch in range(epochs):
             self.model.train()
             print(f"------------------------------[Epoch {epoch+1}]------------------------------")
@@ -64,8 +64,28 @@ class ModelManager():
             train_acc_epoch = round(train_acc/len(self.train_dl),4)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
-    
+            print(f"Training Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
+            if self.test_dl:
+                test_loss,test_acc = 0,0
+                print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
+                self.model.eval()
+                with torch.inference_mode():
+                    for batch, (X,y) in enumerate(self.test_dl):
+                        test_logits = self.model(X)
+                        loss = self.loss_fn(test_logits,y)
+                        test_loss+=round(loss.item(),4)
+                        self.batch_stats("test_loss").append(loss)
+                        acc = round((test_logits.argmax(dim=1) == y).float().mean().item(),4)
+                        test_acc+= acc
+                        self.batch_stats("test_acc").append(acc)
+                        if batch % print_interval_test == 0:
+                            print(f"Batch {batch}/{len(self.test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
+                    test_loss_epoch = round(test_loss/len(self.test_dl),4)
+                    test_acc_epoch = round(test_acc/len(self.test_dl),4)
+                    print(f"Testing Epoch {epoch+1} stats:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
+                    self.epoch_stats["test_loss"].append(test_loss_epoch)
+                    self.epoch_stats["test_acc"].append(test_acc_epoch)
+
         return self.batch_stats, self.epoch_stats
     
     def evaluate(self):
