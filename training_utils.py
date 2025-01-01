@@ -64,7 +64,7 @@ class ModelManager():
             train_acc_epoch = train_acc/len(self.train_dl)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Epoch {epoch} stats:\nAverage Loss: {train_loss_epoch}\n Average Accuracy: {train_acc_epoch}")
+            print(f"Epoch {epoch} stats:\nAverage Loss: {train_loss_epoch:.4f}\n Average Accuracy: {(train_acc_epoch)*100:.4f}")
     
         return self.batch_stats, self.epoch_stats
     
