@@ -59,12 +59,12 @@ class ModelManager():
                 self.optimizer.step()
 
                 if batch % print_interval_train == 0:
-                    print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy {acc}")
-            train_loss_epoch = train_loss/len(self.train_dl)
-            train_acc_epoch = train_acc/len(self.train_dl)
+                    print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
+            train_loss_epoch = round(train_loss/len(self.train_dl),4)
+            train_acc_epoch = round(train_acc/len(self.train_dl),4)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch:.4f}\nAverage Accuracy: {(train_acc_epoch)*100:.4f}%")
+            print(f"Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
     
         return self.batch_stats, self.epoch_stats
     
