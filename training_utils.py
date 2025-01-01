@@ -64,8 +64,9 @@ class ModelManager():
             train_acc_epoch = round(train_acc/len(self.train_dl),4)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Training Epoch {epoch+1} stats:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
+            print(f"Training Summary for Epoch {epoch+1}:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
             if self.test_dl:
+                print(f"\nTesting Phase:")
                 test_loss,test_acc = 0,0
                 print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
                 self.model.eval()
@@ -83,11 +84,11 @@ class ModelManager():
                             print(f"Batch {batch}/{len(self.test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
                     test_loss_epoch = round(test_loss/len(self.test_dl),4)
                     test_acc_epoch = round(test_acc/len(self.test_dl),4)
-                    print(f"Testing Epoch {epoch+1} stats:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
+                    print(f"Testing Summary for Epoch {epoch+1}:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
                     self.epoch_stats["test_loss"].append(test_loss_epoch)
                     self.epoch_stats["test_acc"].append(test_acc_epoch)
 
-        return self.batch_stats, self.epoch_stats
+        return 
     
     def evaluate(self):
         pass
@@ -99,4 +100,10 @@ class ModelManager():
         pass
 
     def summary(self):
-        pass
+        print("____________________________ Training Summary ____________________________")
+        print(f"Final Training Loss: {self.epoch_stats["train_loss"][-1]}")
+        print(f"Final Training Accuracy: {self.epoch_stats["train_acc"][-1]*100}%")
+        if self.train_dl:
+            print("____________________________ Testing Summary ____________________________")
+            print(f"Final Testing Loss: {self.epoch_stats["test_loss"][-1]}")
+            print(f"Final Testing Accuracy: {self.epoch_stats["test_acc"][-1]*100}%")
