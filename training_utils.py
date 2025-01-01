@@ -101,9 +101,9 @@ class ModelManager():
 
     def summary(self):
         print("____________________________ Training Summary ____________________________")
-        print(f"Final Training Loss: {self.epoch_stats["train_loss"][-1]}")
+        print(f"Final Training Loss: {self.epoch_stats['train_loss'][-1]}")
         print(f"Final Training Accuracy: {self.epoch_stats["train_acc"][-1]*100}%")
         if self.train_dl:
             print("____________________________ Testing Summary ____________________________")
-            print(f"Final Testing Loss: {self.epoch_stats["test_loss"][-1]}")
-            print(f"Final Testing Accuracy: {self.epoch_stats["test_acc"][-1]*100}%")
+            print(f"Final Testing Loss: {self.epoch_stats['test_loss'][-1]}")
+            print(f"Final Testing Accuracy: {self.epoch_stats['test_acc'][-1]*100}%")
