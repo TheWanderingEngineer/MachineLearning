@@ -157,7 +157,7 @@ class ModelManager():
 
     def learning_curves(self, acc = False):
         fig, (ax1,ax2) = plt.subplots(1,2,figsize=(15,10))
-        fig.suptitle(f"Learning Curves of Model: {self.model}", fontsize=16)
+        fig.suptitle(f"Learning Curves of Model: {type(self.model).__name__}", fontsize=16)
 
         train_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_loss"]]
         test_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_loss"]]
