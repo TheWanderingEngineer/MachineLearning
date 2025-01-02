@@ -5,6 +5,8 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from time import time
 import numpy as np
+import random
+
 class ModelManager():
     def __init__(self,
                 model: nn.Module,
@@ -33,6 +35,9 @@ class ModelManager():
         }
         self.train_test_time = None
         print(f"ModelManager initialized on device: {self.device}")
+
+        self.classes = self.train_dl.dataset.dataset.classes
+        self.transforms = train_dl.dataset.dataset.transform
 
     def train_test(self,epochs: int = 5,
                    prints_per_epoch: int = 5,
@@ -97,11 +102,58 @@ class ModelManager():
         else:
             print(f"Training completed in {self.train_test_time:.2f} seconds.")
     
-    def evaluate(self):
-        pass
+    def evaluate(self, custom_dl=None):
+        data_loader = custom_dl if custom_dl else self.test_dl
+        if not data_loader:
+            print("No test dataset provided. Skipping evaluation.")
+            return None
 
-    def predict(self):
-        pass
+        self.model.to(self.device)
+        self.model.eval()
+        test_loss, test_acc = 0, 0
+        with torch.inference_mode():
+            for X, y in data_loader:
+                X, y = X.to(self.device), y.to(self.device)
+                logits = self.model(X)
+                loss = self.loss_fn(logits, y)
+                test_loss += loss.item()
+                acc = (logits.argmax(dim=1) == y).float().mean().item()
+                test_acc += acc
+
+        avg_loss = round(test_loss / len(data_loader), 4)
+        avg_acc = round(test_acc / len(data_loader), 4)
+
+        print("Evaluation Summary:")
+        print(f"Average Loss: {avg_loss:.4f}")
+        print(f"Average Accuracy: {avg_acc * 100:.2f}%")
+
+        return avg_loss, avg_acc
+
+
+
+
+    def predict(self, data = None, n = 4):
+        
+        self.model.to(self.device)
+        fig = plt.figure(figsize=(10,10))
+        data_size = len(self.test_dl.dataset.dataset)
+        correct = 0
+        for i in range(n*n):
+            sample = self.test_dl.dataset.dataset[random.randint(0,data_size-1)]
+            img, label = sample
+            pred = self.model(img.unsqueeze(0).to(self.device)).argmax(dim=1)
+            fig.add_subplot(n,n,i+1)
+            plt.imshow(img.permute(1,2,0))
+            if pred == label:
+                plt.title(f"Actual: {self.classes[label]} \n Prediction: {self.classes[pred]}", color = 'green')
+                correct+=1
+            else:
+                plt.title(f"Actual: {self.classes[label]} \n Prediction: {self.classes[pred]}", color = 'red')
+            plt.axis('off')
+        plt.suptitle(f"{n*n} random images with model predictions", fontsize=18, color="black")
+        plt.figtext(0.5, 0.08, f"{correct}/{n*n} Predicited Correctly", fontsize=14, color="blue",ha="center")
+        plt.tight_layout()
+        plt.show()
 
     def learning_curves(self, acc = False):
         fig, (ax1,ax2) = plt.subplots(1,2,figsize=(15,10))
