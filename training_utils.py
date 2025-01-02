@@ -158,10 +158,16 @@ class ModelManager():
     def learning_curves(self, acc = False):
         fig, (ax1,ax2) = plt.subplots(1,2,figsize=(15,10))
         fig.suptitle(f"Learning Curves of Model: {self.model}", fontsize=16)
-        steps = range(len(self.batch_stats["train_loss"]))
-        ax1.plot(steps, self.batch_stats["train_loss"], color = 'blue', label = "Train Loss")
-        if len(self.batch_stats["test_loss"]) > 0:
-            ax1.plot(steps, self.batch_stats["test_loss"], color = 'green', label = "Test Loss")
+
+        train_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_loss"]]
+        test_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_loss"]]
+        train_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_acc"]]
+        test_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_acc"]]
+        
+        steps = range(len(train_loss))
+        ax1.plot(steps, train_loss, color = 'blue', label = "Train Loss")
+        if len(test_loss) > 0:
+            ax1.plot(steps, test_loss, color = 'green', label = "Test Loss")
         else:
             print("Warning: Test Loss is empty. Skipping test loss curve.")
         ax1.set_title("Loss Curves")
@@ -169,9 +175,9 @@ class ModelManager():
         ax1.set_ylabel("Loss")
         ax1.legend()
         if acc:
-            ax2.plot(steps, self.batch_stats["train_acc"], color = 'blue', label = "Train Accuracy")
-            if len(self.batch_stats["test_acc"]) > 0:
-                ax2.plot(steps, self.batch_stats["test_acc"], color = 'green', label = "Test Accuracy")
+            ax2.plot(steps, train_acc, color = 'blue', label = "Train Accuracy")
+            if len(test_acc) > 0:
+                ax2.plot(steps, test_acc, color = 'green', label = "Test Accuracy")
             else:
                 print("Warning: Test Accuracy is empty. Skipping test accuracy curve.")
             ax2.set_title("Accuracy Curves")
