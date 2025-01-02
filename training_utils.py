@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from time import time
 import numpy as np
 import random
-
+from torchvision.datasets import ImageFolder
 class ModelManager():
     def __init__(self,
                 model: nn.Module,
@@ -36,7 +36,7 @@ class ModelManager():
         self.train_test_time = None
         print(f"ModelManager initialized on device: {self.device}")
 
-        self.classes = self.train_dl.dataset.classes
+        self.classes = train_dl.dataset.classes
         self.transforms = train_dl.dataset.transform
 
     def train_test(self,epochs: int = 5,
