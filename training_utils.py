@@ -164,8 +164,8 @@ class ModelManager():
         train_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_acc"]]
         test_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_acc"]]
         
-        steps = range(len(train_loss))
-        ax1.plot(steps, train_loss, color = 'blue', label = "Train Loss")
+        steps = range(len(test_loss))
+        ax1.plot(steps, train_loss[:len(test_loss)], color = 'blue', label = "Train Loss")
         if len(test_loss) > 0:
             ax1.plot(steps, test_loss, color = 'green', label = "Test Loss")
         else:
@@ -175,7 +175,7 @@ class ModelManager():
         ax1.set_ylabel("Loss")
         ax1.legend()
         if acc:
-            ax2.plot(steps, train_acc, color = 'blue', label = "Train Accuracy")
+            ax2.plot(steps, train_acc[:len(test_loss)], color = 'blue', label = "Train Accuracy")
             if len(test_acc) > 0:
                 ax2.plot(steps, test_acc, color = 'green', label = "Test Accuracy")
             else:
