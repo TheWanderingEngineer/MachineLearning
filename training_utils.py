@@ -36,8 +36,8 @@ class ModelManager():
         self.train_test_time = None
         print(f"ModelManager initialized on device: {self.device}")
 
-        self.classes = self.train_dl.dataset.dataset.classes
-        self.transforms = train_dl.dataset.dataset.transform
+        self.classes = self.train_dl.dataset.classes
+        self.transforms = train_dl.dataset.transform
 
     def train_test(self,epochs: int = 5,
                    prints_per_epoch: int = 5,
@@ -136,10 +136,10 @@ class ModelManager():
         
         self.model.to(self.device)
         fig = plt.figure(figsize=(10,10))
-        data_size = len(self.test_dl.dataset.dataset)
+        data_size = len(self.test_dl.dataset)
         correct = 0
         for i in range(n*n):
-            sample = self.test_dl.dataset.dataset[random.randint(0,data_size-1)]
+            sample = self.test_dl.dataset[random.randint(0,data_size-1)]
             img, label = sample
             pred = self.model(img.unsqueeze(0).to(self.device)).argmax(dim=1)
             fig.add_subplot(n,n,i+1)
