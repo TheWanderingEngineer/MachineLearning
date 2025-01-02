@@ -3,7 +3,8 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-
+from time import time
+import numpy as np
 class ModelManager():
     def __init__(self,
                 model: nn.Module,
@@ -30,6 +31,7 @@ class ModelManager():
             "test_loss": [],
             "test_acc": []
         }
+        self.train_test_time = None
         print(f"ModelManager initialized on device: {self.device}")
 
     def train_test(self,epochs: int = 5,
@@ -37,9 +39,10 @@ class ModelManager():
                    clip_grad: Optional[float] = None,
                    scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None,
                    target_test_acc: Optional[float] = None):
+        start_time = time()
         self.model.to(self.device)
         print_interval_train = max(1, len(self.train_dl)//(prints_per_epoch))
-        
+    
         for epoch in range(epochs):
             self.model.train()
             print(f"------------------------------[Epoch {epoch+1}]------------------------------")
@@ -87,8 +90,8 @@ class ModelManager():
                     print(f"Testing Summary for Epoch {epoch+1}:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
                     self.epoch_stats["test_loss"].append(test_loss_epoch)
                     self.epoch_stats["test_acc"].append(test_acc_epoch)
-
-        return 
+        end_time = time()
+        self.train_test_time = end_time-start_time
     
     def evaluate(self):
         pass
@@ -99,11 +102,21 @@ class ModelManager():
     def learning_curves(self):
         pass
 
-    def summary(self):
-        print("____________________________ Training Summary ____________________________")
+    def summary(self, hyperparamters = False):
+        print("____________________________ Train Summary ____________________________")
         print(f"Final Training Loss: {self.epoch_stats['train_loss'][-1]}")
         print(f"Final Training Accuracy: {self.epoch_stats['train_acc'][-1]*100}%")
         if self.train_dl:
-            print("____________________________ Testing Summary ____________________________")
+            print("____________________________ Test Summary ____________________________")
             print(f"Final Testing Loss: {self.epoch_stats['test_loss'][-1]}")
             print(f"Final Testing Accuracy: {self.epoch_stats['test_acc'][-1]*100}%")
+            print(f"Best Testing Accuracy: {max(self.epoch_stats['test_acc']):.2f}% at epoch {np.argmax(self.epoch_stats['test_acc'])+1}")
+            print(f"\nTraining & Testing time: {self.train_test_time:.2f} seconds")
+        else:
+            print(f"\nTraining time: {self.train_test_time:.2f} seconds")
+        if hyperparamters:
+            print("____________________________ Hyperparamters ____________________________")
+            print(f"Optimizer: {type(self.optimizer).__name__}")
+            print(f"Learning Rate: {self.optimizer.param_groups[0]['lr']}")
+            print(f"Loss Function: {type(self.loss_fn).__name__}")
+            print(f"Device: {self.device}")
