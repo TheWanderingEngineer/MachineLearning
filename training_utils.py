@@ -132,14 +132,14 @@ class ModelManager():
 
 
 
-    def predict(self, data = None, n = 4):
-        
+    def predict(self, data: DataLoader = None, n = 4):
+        dataloader = data if data is not None else self.test_dl
         self.model.to(self.device)
         fig = plt.figure(figsize=(10,10))
-        data_size = len(self.test_dl.dataset)
+        data_size = len(dataloader.dataset)
         correct = 0
         for i in range(n*n):
-            sample = self.test_dl.dataset[random.randint(0,data_size-1)]
+            sample = dataloader.dataset[random.randint(0,data_size-1)]
             img, label = sample
             pred = self.model(img.unsqueeze(0).to(self.device)).argmax(dim=1)
             fig.add_subplot(n,n,i+1)
