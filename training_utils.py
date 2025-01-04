@@ -190,7 +190,7 @@ class ModelManager():
             else:
                 print("Warning: Test Accuracy is empty. Skipping test accuracy curve.")
             ax2.set_title("Accuracy Curves")
-            ax2.set_xlabel("Steps (In Batches)")
+            ax2.set_xlabel(f"Steps (In {step})")
             ax2.set_ylabel("Accuracy")
             ax2.legend()
         plt.tight_layout()
