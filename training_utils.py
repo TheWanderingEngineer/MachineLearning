@@ -155,14 +155,23 @@ class ModelManager():
         plt.tight_layout()
         plt.show()
 
-    def learning_curves(self, acc = False):
+    def learning_curves(self, acc = True, step = 'epoch'):
         fig, (ax1,ax2) = plt.subplots(1,2,figsize=(15,10))
         fig.suptitle(f"Learning Curves of Model: {type(self.model).__name__}", fontsize=16)
 
-        train_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_loss"]]
-        test_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_loss"]]
-        train_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_acc"]]
-        test_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_acc"]]
+        if step == 'epoch':
+            train_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.epoch_stats["train_loss"]]
+            test_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.epoch_stats["test_loss"]]
+            train_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.epoch_stats["train_acc"]]
+            test_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.epoch_stats["test_acc"]]
+        elif step == 'batch':
+            train_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_loss"]]
+            test_loss = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_loss"]]
+            train_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["train_acc"]]
+            test_acc = [val.cpu().numpy() if isinstance(val, torch.Tensor) else val for val in self.batch_stats["test_acc"]]
+        else:
+            raise ValueError("You must set 'step' to either 'epoch' or 'batch'!")
+
         
         steps = range(len(test_loss))
         ax1.plot(steps, train_loss[:len(test_loss)], color = 'blue', label = "Train Loss")
