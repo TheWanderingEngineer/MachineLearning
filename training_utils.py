@@ -14,6 +14,7 @@ class ModelManager():
                train_dl: DataLoader,
                test_dl: Optional[DataLoader] = None,
                loss_fn: Optional[nn.Module] = None,
+               classes: Optional[list] = None,
                device: str = 'cuda' if torch.cuda.is_available() else 'cpu'):
         self.model = model
         self.loss_fn = loss_fn or nn.CrossEntropyLoss()
@@ -36,8 +37,10 @@ class ModelManager():
         self.train_test_time = None
         print(f"ModelManager initialized on device: {self.device}")
 
-        self.classes = train_dl.dataset.classes
-        self.transforms = train_dl.dataset.transform
+        self.classes = getattr(train_dl.dataset,"classes", classes)
+        if self.classes == None:
+            raise ValueError("Classes can't be obtained; provide them manually.")
+        self.transforms = getattr(train_dl.dataset, "transform", None)
 
     def train_test(self,epochs: int = 5,
                    prints_per_epoch: int = 5,
