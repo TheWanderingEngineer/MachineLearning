@@ -183,7 +183,7 @@ class ModelManager():
         else:
             print("Warning: Test Loss is empty. Skipping test loss curve.")
         ax1.set_title("Loss Curves")
-        ax1.set_xlabel("Steps (In Batches)")
+        ax1.set_xlabel(f"Steps (In {step})")
         ax1.set_ylabel("Loss")
         ax1.legend()
         if acc:
