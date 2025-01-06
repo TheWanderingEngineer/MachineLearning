@@ -43,18 +43,20 @@ class ModelManager():
         self.transforms = getattr(train_dl.dataset, "transform", None)
 
     def train_test(self,epochs: int = 5,
+                   print_progress: bool = True,
                    prints_per_epoch: int = 5,
                    clip_grad: Optional[float] = None,
                    scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None,
-                   target_test_acc: Optional[float] = None):
+                   target_test_acc: Optional[float] = None,):
         start_time = time()
         self.model.to(self.device)
         print_interval_train = max(1, len(self.train_dl)//(prints_per_epoch))
     
         for epoch in range(epochs):
             self.model.train()
-            print(f"------------------------------[Epoch {epoch+1}]------------------------------")
-            print(f"Training Phase:")
+            if print_progress:
+                print(f"------------------------------[Epoch {epoch+1}]------------------------------")
+                print(f"Training Phase:")
             train_loss, train_acc = 0,0
             for batch, (X,y) in enumerate(self.train_dl):
                 X, y = X.to(self.device), y.to(self.device)
@@ -68,16 +70,18 @@ class ModelManager():
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-
-                if batch % print_interval_train == 0:
-                    print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100:.4f}%")
+                if print_progress:
+                    if batch % print_interval_train == 0:
+                        print(f"Batch {batch}/{len(self.train_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100:.4f}%")
             train_loss_epoch = round(train_loss/len(self.train_dl),4)
             train_acc_epoch = round(train_acc/len(self.train_dl),4)
             self.epoch_stats["train_loss"].append(train_loss_epoch)
             self.epoch_stats["train_acc"].append(train_acc_epoch)
-            print(f"Training Summary for Epoch {epoch+1}:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
+            if print_progress:
+                print(f"Training Summary for Epoch {epoch+1}:\nAverage Loss: {train_loss_epoch: }\nAverage Accuracy: {(train_acc_epoch)*100}%")
             if self.test_dl:
-                print(f"\nTesting Phase:")
+                if print_progress:
+                    print(f"\nTesting Phase:")
                 test_loss,test_acc = 0,0
                 print_interval_test = max(1, len(self.test_dl)//(prints_per_epoch))
                 self.model.eval()
@@ -91,11 +95,13 @@ class ModelManager():
                         acc = round((test_logits.argmax(dim=1) == y).float().mean().item(),4)
                         test_acc+= acc
                         self.batch_stats["test_acc"].append(acc)
-                        if batch % print_interval_test == 0:
-                            print(f"Batch {batch}/{len(self.test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
+                        if print_progress:
+                            if batch % print_interval_test == 0:
+                                print(f"Batch {batch}/{len(self.test_dl)}: Loss = {loss.item():.4f} | Accuracy = {acc*100}%")
                     test_loss_epoch = round(test_loss/len(self.test_dl),4)
                     test_acc_epoch = round(test_acc/len(self.test_dl),4)
-                    print(f"Testing Summary for Epoch {epoch+1}:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
+                    if print_progress:
+                        print(f"Testing Summary for Epoch {epoch+1}:\nAverage Loss: {test_loss_epoch: }\nAverage Accuracy: {(test_acc_epoch)*100}%")
                     self.epoch_stats["test_loss"].append(test_loss_epoch)
                     self.epoch_stats["test_acc"].append(test_acc_epoch)
         end_time = time()
